@@ -1,0 +1,20 @@
+Package: SpatialSocialMedia
+Title: Visualize Social Media Data on a Map
+Type: Package
+Version: 0.0.1
+Date: 2020-08-30
+Authors@R: 
+    person(given = "Marco",
+           family = "Bastos",
+           role = c("aut", "cre"),
+           email = "marco@toledobastos.com",
+           comment = c(ORCID = "0000-0003-0480-1078"))
+Description: SpatialSocialMedia allows plots social media data over geographic grids using R base map library and the GADM database, a free spatial database of the location of the world’s administrative areas or boundaries. Network plots are generated using the capabilities of igraph, network, ggplot, ggplot2 (curved edges), or ggraph.
+License: `use_mit_license()`
+Encoding: UTF-8
+Imports: igraph, network, intergraph, ggraph, ggplot2, ISOcodes, maps, GADMTools, geosphere, stringr, sp, grDevices
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.0
+Depends: 
+    R (>= 2.10)
