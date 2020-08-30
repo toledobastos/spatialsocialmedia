@@ -53,6 +53,7 @@ plot.spatial.network <- function(geo.graph,
                                  label.cex.network = 0.5,
                                  edge.curve.network = 0.5,
                                  edge.width.ggplot = 1,
+                                 alpha.ggplot = 1,
                                  edge.width.ggraph = "weight",
                                  avoid.overlap.ggraph = TRUE,
                                  vertex.label.cex.ggraph = 3,
@@ -102,7 +103,7 @@ plot.spatial.network <- function(geo.graph,
       iso.db <- ISOcodes::ISO_3166_1
       print(paste0("Attempting to load GADM map at level ", gadm.level, ". Try lower values if base map is unavailable at this level"))
       iso.code <- iso.db$Alpha_3[grep(area[1], iso.db$Name, ignore.case = T)]
-      try(map.new <- maps::SpatialPolygons2map(as(GADMTools::map_data(iso.code, level=gadm.level, basefile="./")$sf, "Spatial")), silent=T)
+      try(map.new <- maps::SpatialPolygons2map(as(GADMTools::gadm_sf_loadCountries(iso.code, level=gadm.level, basefile="./")$sf, "Spatial")), silent=T)
       if(exists("map.new")) {
         maps::map(map.new, col=line.col, fill=F, bg="white")
         plot.add <- T }
@@ -159,7 +160,7 @@ plot.spatial.network <- function(geo.graph,
     if(is.null(igraph::V(geo.graph)$latitude)) { igraph::V(geo.n)$latitude <- lat}
     if(is.null(igraph::V(geo.graph)$longitude)) { igraph::V(geo.n)$longitude <- lon}
 
-    if(is.null(network::get.vertex.attribute(geo.n, "latitude")) | is.na(unique(network::get.vertex.attribute(geo.n, "latitude")))) {
+    if(is.null(network::get.vertex.attribute(geo.n, "latitude")) | unique(is.na(network::get.vertex.attribute(geo.n, "latitude")))) {
       network::set.vertex.attribute(geo.n, "latitude", latitude)
       network::set.vertex.attribute(geo.n, "longitude", longitude)
     }
@@ -170,9 +171,9 @@ plot.spatial.network <- function(geo.graph,
       iso.db <- ISOcodes::ISO_3166_1
       print(paste0("Attempting to load GADM map at level ", gadm.level, ". Try lower values if base map is unavailable at this level"))
       iso.code <- iso.db$Alpha_3[grep(area[1], iso.db$Name, ignore.case = T)]
-      try(map.new <- maps::SpatialPolygons2map(as(GADMTools::map_data(iso.code, level=gadm.level, basefile="./")$sf, "Spatial")), silent=T)
-      # if(!exists("map.new")) { try(map.new <- maps::SpatialPolygons2map(as(GADMTools::map_data(iso.code, level=1, basefile="./")$sf, "Spatial")), silent=T) }
-      # if(!exists("map.new")) { try(map.new <- maps::SpatialPolygons2map(as(GADMTools::map_data(iso.code, level=0, basefile="./")$sf, "Spatial")), silent=T) }
+      try(map.new <- maps::SpatialPolygons2map(as(GADMTools::gadm_sf_loadCountries(iso.code, level=gadm.level, basefile="./")$sf, "Spatial")), silent=T)
+      # if(!exists("map.new")) { try(map.new <- maps::SpatialPolygons2map(as(GADMTools::gadm_sf_loadCountries(iso.code, level=1, basefile="./")$sf, "Spatial")), silent=T) }
+      # if(!exists("map.new")) { try(map.new <- maps::SpatialPolygons2map(as(GADMTools::gadm_sf_loadCountries(iso.code, level=0, basefile="./")$sf, "Spatial")), silent=T) }
       if(exists("map.new")) {
         maps::map(map.new, col=line.col, fill=F, bg="white")
         plot.add <- T }
@@ -223,8 +224,8 @@ plot.spatial.network <- function(geo.graph,
                           jitter = FALSE)
     # dev.off()
   }
-  if(package=="ggplot") {
-    ### PLOT METHOD 3: ggplot2
+  if(package=="geosphere") {
+    ### PLOT METHOD 3: geosphere
     geo.edges <- as.data.frame(igraph::get.edgelist(geo.graph), stringsAsFactors=F)
     geo.nodes <- data.frame(vertex=as.character(igraph::V(geo.graph)$name), latitude=as.numeric(igraph::V(geo.graph)$latitude), longitude=as.numeric(igraph::V(geo.graph)$longitude), stringsAsFactors=F)
     # plot black
@@ -235,8 +236,8 @@ plot.spatial.network <- function(geo.graph,
       print(paste0("Attempting to load GADM map at level ", gadm.level, ". Try lower values if base map is unavailable at this level"))
       iso.code <- iso.db$Alpha_3[grep(area[1], iso.db$Name, ignore.case = T)]
       try(map.new <- maps::SpatialPolygons2map(as(GADMTools::gadm_sf_loadCountries(iso.code, level=gadm.level, basefile="./")$sf, "Spatial")), silent=T)
-      # if(!exists("map.new")) { try(map.new <- maps::SpatialPolygons2map(as(GADMTools::map_data(iso.code, level=1, basefile="./")$sf, "Spatial")), silent=T) }
-      # if(!exists("map.new")) { try(map.new <- maps::SpatialPolygons2map(as(GADMTools::map_data(iso.code, level=0, basefile="./")$sf, "Spatial")), silent=T) }
+      # if(!exists("map.new")) { try(map.new <- maps::SpatialPolygons2map(as(GADMTools::gadm_sf_loadCountries(iso.code, level=1, basefile="./")$sf, "Spatial")), silent=T) }
+      # if(!exists("map.new")) { try(map.new <- maps::SpatialPolygons2map(as(GADMTools::gadm_sf_loadCountries(iso.code, level=0, basefile="./")$sf, "Spatial")), silent=T) }
       if(exists("map.new")) {
         maps::map(map.new, col=line.col, fill=F, bg="white")
         plot.add <- T }
@@ -290,6 +291,7 @@ plot.spatial.network <- function(geo.graph,
     }
   }
   if(package=="ggplot2") {
+    ### PLOT METHOD 4: ggplot2
     # prepare data
     geo.edges <- as.data.frame(igraph::get.edgelist(geo.graph), stringsAsFactors=F)
     geo.nodes <- data.frame(name=as.character(igraph::V(geo.graph)$name), latitude=as.numeric(igraph::V(geo.graph)$latitude), longitude=as.numeric(igraph::V(geo.graph)$longitude), stringsAsFactors=F)
@@ -339,9 +341,10 @@ plot.spatial.network <- function(geo.graph,
                                             data = map.new,
                                             fill = "white", color = "black",
                                             size = 0.15)
-    mapcoords <- ggplot2::coord_fixed(xlim = c(-150, 180), ylim = c(-55, 80))
+    # mapcoords <- ggplot2::coord_fixed(xlim = c(-150, 180), ylim = c(-55, 80))
     # plot with ggplot2
     ggplot2::ggplot(geo.nodes) + country_shapes + ggplot2::theme_void() + ggplot2::theme(legend.position = "none") +
+      ggplot2::coord_fixed() + ggplot2::theme(aspect.ratio=1) +
       ggplot2::geom_curve(ggplot2::aes(x = x, y = y, xend = xend, yend = yend,     # draw edges as arcs
                               color = edge.col, size = weight/edge.width.ggplot),
                           data = edges_for_plot, curvature = 0.33, alpha = 0.5) +
@@ -349,10 +352,11 @@ plot.spatial.network <- function(geo.graph,
       ggplot2::geom_point(ggplot2::aes(x = lat, y = lon, size = weight),           # draw nodes
                           shape = 21, fill = 'black',
                           color = 'white', stroke = 0.5) +
-      # ggplot2::scale_size_continuous(guide = FALSE, range = c(1, 6)) +    # scale for node size
+      ggplot2::scale_size_continuous(guide = FALSE, range = c(1, 6)) +    # scale for node size
       ggplot2::geom_text(ggplot2::aes(x = lat, y = lon, label = labels))
   }
   if(package=="ggraph") {
+    ### PLOT METHOD 5: ggraph
     # load theme
     maptheme <- ggplot2::theme(panel.grid = element_blank()) +
       ggplot2::theme(axis.text = element_blank()) +
@@ -412,7 +416,7 @@ plot.spatial.network <- function(geo.graph,
                                             data = map.new,
                                             fill = "white", color = "black",
                                             size = 0.15)
-    mapcoords <- ggplot2::coord_fixed(xlim = c(-150, 180), ylim = c(-55, 80))
+    # mapcoords <- ggplot2::coord_fixed(xlim = c(-150, 180), ylim = c(-55, 80))
     # create node position table
     node_pos <- data.frame(x=geo.nodes$lon, y=geo.nodes$lat, stringsAsFactors=F)
     lay <- ggraph::create_layout(graph = geo.graph, layout = as.matrix(data.frame(lon=as.numeric(igraph::V(geo.graph)$longitude),lat=as.numeric(igraph::V(geo.graph)$latitude))))
@@ -420,12 +424,23 @@ plot.spatial.network <- function(geo.graph,
     # add node degree for scaling the node sizes
     lay$weight <- as.integer(igraph::degree(geo.graph))
     # if(edge.width.ggraph=="weight") { edge.width.ggraph <- lay$weight }
+    # specify edge colors
+    if(class(geo.graph)=="igraph" & is.null(igraph::E(geo.graph)$color)) {
+      edge.pal <- grDevices::colorRampPalette(c(col.1, col.2), alpha = TRUE)
+      edge.color.ggraph <- edge.pal(igraph::ecount(geo.graph))
+    } else { edge.color.ggraph <- igraph::E(geo.graph)$color }
+
+    if(class(geo.graph)=="igraph" & is.null(igraph::V(geo.graph)$color)) {
+      edge.pal <- grDevices::colorRampPalette(c(col.1, col.2), alpha = TRUE)
+      node.color.ggraph <- edge.pal(igraph::vcount(geo.graph))
+    } else { node.color.ggraph <- igraph::V(geo.graph)$color }
     # plot with ggraph
     ggraph::ggraph(lay) + country_shapes + ggplot2::theme_void() + ggplot2::theme(legend.position = "none") +
-      ggraph::geom_edge_arc(ggplot2::aes(color = igraph::E(geo.graph)$color, edge_width = weight, circular = FALSE),
+      ggplot2::coord_fixed() + ggplot2::theme(aspect.ratio=1) +
+      ggraph::geom_edge_arc(ggplot2::aes(color = edge.color.ggraph, edge_width = weight, circular = FALSE),
                             data = edges_for_plot, strength = 0.33, alpha = 0.5) +                    # draw edges as arcs
       ggraph::scale_edge_width_continuous(range = c(0.0001, 1), guide = FALSE) +                         # scale for edge widths
-      ggraph::geom_node_point(ggplot2::aes(size=weight), shape=21, fill="white", color=igraph::V(geo.graph)$color, stroke=0.5) +  # draw nodes
+      ggraph::geom_node_point(ggplot2::aes(size=weight), shape=21, fill="white", color=node.color.ggraph, stroke=0.5) +  # draw nodes
       ggplot2::scale_size_continuous(range = c(1, 6), guide = FALSE) +                                 # scale for node sizes
       ggraph::geom_node_text(ggplot2::aes(label = nodeLabels), repel = avoid.overlap.ggraph, size = vertex.label.cex.ggraph, color = "black", fontface = "bold")
     # + maptheme

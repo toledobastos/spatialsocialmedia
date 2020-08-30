@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot.spatial.network.R
 \name{plot.spatial.network}
 \alias{plot.spatial.network}
-\title{The function plot.spatial.network() allows one to plot social network data over geographic grids using R base map library and the GADM database, a free spatial database of the location of the world’s administrative areas or boundaries. Network plots are generated using the capabilities of igraph, network, ggplot, ggplot2 (curved edges), or ggraph. The function accepts optional arguments and parameters.}
+\title{The function plot.spatial.network() allows one to plot social network data over geographic grids using R base map library and the GADM database, a free spatial database of the location of the world’s administrative areas or boundaries. Network plots are generated using the capabilities of igraph, network, geosphere, ggplot2 (curved edges), or ggraph. The function accepts optional arguments and parameters.}
 \usage{
 plot.spatial.network(
   geo.graph,
@@ -27,6 +27,7 @@ plot.spatial.network(
   label.cex.network = 0.5,
   edge.curve.network = 0.5,
   edge.width.ggplot = 10,
+  alpha.ggplot = 1,
   edge.width.ggraph = "weight",
   avoid.overlap.ggraph = TRUE,
   vertex.label.cex.ggraph = 3,
@@ -77,7 +78,9 @@ plot.spatial.network(
 
 \item{edge.curve.network:}{Width of curved edge (network only). Defaults to 0.5}
 
-\item{edge.width.ggplot:}{Width of edge (ggplot only). Defaults to 1}
+\item{edge.width.ggplot:}{Width of edge (ggplot & geosphere). Defaults to 1}
+
+\item{alpha.ggplot:}{Edge color alpha parameter (ggplot, geosphere, and ggraph). Defaults to 1}
 
 \item{edge.width.ggraph:}{Width of edge (ggraph only). Defaults to node weight}
 
