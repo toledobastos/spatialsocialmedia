@@ -20,3 +20,4 @@
 #' data(covid.ie.g)
 #' igraph::list.vertex.attributes(covid.ie.g)
 #' igraph::list.edge.attributes(covid.ie.g)
+"covid.ie.g"
