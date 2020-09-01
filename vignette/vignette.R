@@ -2,22 +2,38 @@
 ### Vignette
 ###
 
-# setwd
-setwd("U:/sandbox/spatialsocialmedia/vignette")
-
-# # load required functions
-source("U:/sandbox/spatialsocialmedia/R/get.interactions.R")
-source("U:/sandbox/spatialsocialmedia/R/plot.spatial.network.R")
-
-# load required packages
-lapply(c("igraph","maps","ggplot2","geosphere","SpatNet","ggraph","sp","GADMTools","ISOcodes","grDevices","gridExtra"), require, character.only=T)
-
-# laod Irish COVID-19 network
+# # setwd
+# setwd("U:/sandbox/spatialsocialmedia/vignette")
+# source("U:/sandbox/spatialsocialmedia/R/get.interactions.R")
+# source("U:/sandbox/spatialsocialmedia/R/plot.spatial.network.R")
 load("U:/sandbox/spatialsocialmedia/data/covid.ie.g.rda")
+
+# load package
+library(SpatialSocialMedia)
+data("covid.ie.g")
 
 # inspect graph
 igraph::list.vertex.attributes(covid.ie.g)
 igraph::list.edge.attributes(covid.ie.g)
+
+# sample for speed
+library(igraph)
+covid.ie.g <- subgraph.edges(graph=covid.ie.g, eids=which(as.POSIXct(E(covid.ie.g)$time_num, tz = "GMT", origin="1970-01-01")<="2020-03-31"), delete.vertices=TRUE)
+
+# plot montly snapshots with igraph
+par(mfrow=c(2,5), mai = c(1, 0.1, 0.1, 0.1))
+# plot with R maps
+plot.spatial.network(package = "igraph", geo.graph = covid.ie.g, area=c("UK:Northern Ireland", "Ireland"), edge.width.igraph = 0.1)
+plot.spatial.network(package = "network", geo.graph = covid.ie.g, area=c("UK:Northern Ireland", "Ireland"))
+plot.spatial.network(package = "geosphere", geo.graph = covid.ie.g, area=c("UK:Northern Ireland", "Ireland"), database = "world", edge.width.ggplot = 10)
+plot.spatial.network(package = "ggplot2", geo.graph = covid.ie.g, area=c("UK:Northern Ireland", "Ireland"), database = "world", edge.width.ggplot = 1)
+plot.spatial.network(package = "ggraph", geo.graph = covid.ie.g, area=c("UK:Northern Ireland", "Ireland"), database = "world")
+# plot with GADM
+plot.spatial.network(package = "igraph", geo.graph = covid.ie.g, database = "gadm", gadm.level = 1, area=c("Ireland", "United Kingdom:Northern Ireland"), edge.width.igraph = 0.1)
+plot.spatial.network(package = "network", geo.graph = covid.ie.g, database = "gadm", gadm.level = 1, area=c("Ireland", "United Kingdom:Northern Ireland"))
+plot.spatial.network(package = "geosphere", geo.graph = covid.ie.g, area=c("Ireland", "United Kingdom:Northern Ireland"), database = "gadm", gadm.level = 1, edge.width.ggplot = 10)
+plot.spatial.network(package = "ggplot2", geo.graph = covid.ie.g, area=c("Ireland", "United Kingdom:Northern Ireland"), database = "gadm", gadm.level = 1, edge.width.ggplot = 1)
+plot.spatial.network(package = "ggraph", geo.graph = covid.ie.g, area=c("Ireland", "United Kingdom:Northern Ireland"), database = "gadm", gadm.level = 1)
 
 # plot with igraph
 png(file="plot.test.igraph.png", type='cairo', width=15,height=15, units='in', res=300)

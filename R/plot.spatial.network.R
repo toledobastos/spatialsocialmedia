@@ -53,7 +53,7 @@ plot.spatial.network <- function(geo.graph,
                                  label.cex.network = 0.5,
                                  edge.curve.network = 0.5,
                                  edge.width.ggplot = 1,
-                                 alpha.ggplot = 1,
+                                 alpha.ggplot = 0.5,
                                  edge.width.ggraph = "weight",
                                  avoid.overlap.ggraph = TRUE,
                                  vertex.label.cex.ggraph = 3,
@@ -347,7 +347,7 @@ plot.spatial.network <- function(geo.graph,
       ggplot2::coord_fixed() + ggplot2::theme(aspect.ratio=1) +
       ggplot2::geom_curve(ggplot2::aes(x = x, y = y, xend = xend, yend = yend,     # draw edges as arcs
                               color = edge.col, size = weight/edge.width.ggplot),
-                          data = edges_for_plot, curvature = 0.33, alpha = 0.5) +
+                          data = edges_for_plot, curvature = 0.33, alpha = alpha.ggplot) +
       ggplot2::scale_size_continuous(guide = FALSE, range = c(0.25, 2)) + # scale for edge widths
       ggplot2::geom_point(ggplot2::aes(x = lat, y = lon, size = weight),           # draw nodes
                           shape = 21, fill = 'black',
@@ -357,15 +357,6 @@ plot.spatial.network <- function(geo.graph,
   }
   if(package=="ggraph") {
     ### PLOT METHOD 5: ggraph
-    # load theme
-    maptheme <- ggplot2::theme(panel.grid = element_blank()) +
-      ggplot2::theme(axis.text = element_blank()) +
-      ggplot2::theme(axis.ticks = element_blank()) +
-      ggplot2::theme(axis.title = element_blank()) +
-      ggplot2::theme(legend.position = "bottom") +
-      ggplot2::theme(panel.grid = element_blank()) +
-      ggplot2::theme(panel.background = element_rect(fill = "#596673")) +
-      ggplot2::theme(plot.margin = unit(c(0, 0, 0.5, 0), 'cm'))
     # prepare data
     geo.edges <- as.data.frame(igraph::get.edgelist(geo.graph), stringsAsFactors=F)
     geo.nodes <- data.frame(name=as.character(igraph::V(geo.graph)$name), latitude=as.numeric(igraph::V(geo.graph)$latitude), longitude=as.numeric(igraph::V(geo.graph)$longitude), stringsAsFactors=F)
@@ -438,11 +429,10 @@ plot.spatial.network <- function(geo.graph,
     ggraph::ggraph(lay) + country_shapes + ggplot2::theme_void() + ggplot2::theme(legend.position = "none") +
       ggplot2::coord_fixed() + ggplot2::theme(aspect.ratio=1) +
       ggraph::geom_edge_arc(ggplot2::aes(color = edge.color.ggraph, edge_width = weight, circular = FALSE),
-                            data = edges_for_plot, strength = 0.33, alpha = 0.5) +                    # draw edges as arcs
+                            data = edges_for_plot, strength = 0.33, alpha = alpha.ggplot) +                    # draw edges as arcs
       ggraph::scale_edge_width_continuous(range = c(0.0001, 1), guide = FALSE) +                         # scale for edge widths
       ggraph::geom_node_point(ggplot2::aes(size=weight), shape=21, fill="white", color=node.color.ggraph, stroke=0.5) +  # draw nodes
       ggplot2::scale_size_continuous(range = c(1, 6), guide = FALSE) +                                 # scale for node sizes
       ggraph::geom_node_text(ggplot2::aes(label = nodeLabels), repel = avoid.overlap.ggraph, size = vertex.label.cex.ggraph, color = "black", fontface = "bold")
-    # + maptheme
   }
 }
